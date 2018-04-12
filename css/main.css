@@ -1,0 +1,84 @@
+body {
+    background: #000000;
+    color: #ffffff;
+    font-family: monospace;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+a {
+    color: #C0C0FF;
+}
+
+#container {
+    text-align:center;
+    width: 100%;
+}
+
+#inner-container {
+    display: block;
+    position: relative;
+    width: 640px;
+    height: 400px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+#container canvas {
+    display: inline;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+#win,
+#lose,
+#pause,
+#viewport {
+    background: url(../img/sprites.png) no-repeat top left;
+}
+
+#win,
+#lose,
+#pause,
+#play {
+    display: block;
+    position: absolute;
+}
+
+#win {
+    background-position: 0px -486px;
+    width: 244px;
+    height: 28px;
+    left: 192px;
+    top: 32px;
+}
+
+#lose {
+    background-position: 0px -456px;
+    width: 280px;
+    height: 28px;
+    left: 180px;
+    top: 32px;
+}
+
+#pause {
+    background-position: -282px -456px;
+    width: 152px;
+    height: 28px;
+    left: 244px;
+    top: 32px;
+}
+
+#play {
+    background: none;
+    border: none;
+    cursor: pointer;
+    left: 260px;
+    top: 70px;
+    outline: none;
+}
+
+#viewport {
+    background-position: 0px 0px;
+}
