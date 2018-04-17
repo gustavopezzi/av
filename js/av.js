@@ -1,36 +1,33 @@
 var canvas;
-var ctx;
+var canvasContext;
 var left;
 var right;
 var ball;
 
 var spriteCoords = {
-    'left1':  [  0, 402, 60, 52],
-    'left2':  [ 60, 402, 60, 52],
-    'left3':  [120, 402, 60, 52],
-    'ball1':  [180, 402, 50, 42],
-    'ball2':  [230, 402, 50, 42],
-    'ball3':  [280, 402, 50, 42],
-    'ball4':  [330, 402, 50, 42],
+    'left1': [0, 402, 60, 52],
+    'left2': [60, 402, 60, 52],
+    'left3': [120, 402, 60, 52],
+    'ball1': [180, 402, 50, 42],
+    'ball2': [230, 402, 50, 42],
+    'ball3': [280, 402, 50, 42],
+    'ball4': [330, 402, 50, 42],
     'right1': [380, 402, 60, 52],
     'right2': [440, 402, 60, 52],
     'right3': [500, 402, 60, 52],
-    '0':      [560, 402, 16, 16],
-    '1':      [576, 402, 16, 16],
-    '2':      [592, 402, 16, 16],
-    '3':      [608, 402, 16, 16],
-    '4':      [624, 402, 16, 16],
-    '5':      [560, 418, 16, 16],
-    '6':      [576, 418, 16, 16],
-    '7':      [592, 418, 16, 16],
-    '8':      [608, 418, 16, 16],
-    '9':      [524, 418, 16, 16],
-    'star':   [560, 434, 16, 16]
+    '0': [560, 402, 16, 16],
+    '1': [576, 402, 16, 16],
+    '2': [592, 402, 16, 16],
+    '3': [608, 402, 16, 16],
+    '4': [624, 402, 16, 16],
+    '5': [560, 418, 16, 16],
+    '6': [576, 418, 16, 16],
+    '7': [592, 418, 16, 16],
+    '8': [608, 418, 16, 16],
+    '9': [524, 418, 16, 16],
+    'star': [560, 434, 16, 16]
 }
 
-var soundNames = ['hit', 'point', 'loss'];
-var sounds = {};
-var soundEnabled = false;
 var ldCount = 0;
 
 var intervalId;
@@ -40,14 +37,14 @@ var speed = 50;
 var rMode = false;
 var rCnt;
 var winner;
-var tVelX;
-var tVelY;
+var tVelX, tVelY;
 
 var x = [0, 0];
 var y = [0, 0];
+
 var px = [0, 0];
 var frame = [0, 0];
-var frameindex = [0, 0];
+var frameIndex = [0, 0];
 var rebound = [0, 0];
 var score = [0, 0];
 var bx, by;
@@ -58,22 +55,22 @@ var bLogic, bFrame;
 var bIndex;
 var serve;
 var server;
-var serveVel;
-var compServe = 0;
+var servevel;
+var compserve = 0;
 var hits;
 var hitter;
 var starter;
 var gravity;
-var sStage;
-var byTop;
+var sstage;
+var bytop;
 var rnd;
 var endGame;
-var menuon;
-var jflag;
+var menuOn;
+var jFlag;
 var polecol = [0, 1, 2, 3, 3, 4, 6, 7, 9, 14];
 var jump = [-4, -4, -3, -3, -3, -3, -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4];
 var keyMove = [{}, {}];
-var opts = ['C', 'C'];
+var options = ['C', 'C'];
 
 var olx;
 var oly;
@@ -86,13 +83,14 @@ var oCoords = false;
 
 var mode;
 
-$(document).ready(function () {
+$(document).ready(function() {
     canvas = $("#viewport");
-    ctx = canvas[0].getContext("2d");
+    canvasContext = canvas[0].getContext("2d");
     $(document).keydown(onKey);
     $(document).keyup(clearKeys);
-    $('#play').click(function () {
-        opts[0] = 'H';
+
+    $('#play').click(function() {
+        options[0] = 'H';
         $('#play').hide();
         $('#lose').hide();
         $('#win').hide();
@@ -107,20 +105,11 @@ $(document).ready(function () {
         }
     });
     mode = 'menu';
+
     sprites = new Image();
     sprites.src = 'img/sprites.png';
     sprites.onload = onLoad;
 });
-
-function loadSounds() {
-    if ($.isEmptyObject(sounds)) {
-        for (i = 0; i < soundNames.length; i++) {
-            s = soundNames[i];
-            sounds[s] = new Audio();
-            sounds[s].src = 'sounds/' + s + '.wav';
-        }
-    }
-}
 
 function onLoad() {
     initGame();
@@ -202,13 +191,6 @@ function onKey(e) {
             }
             break;
         }
-        case 83: {
-            if (!soundEnabled) {
-                loadSounds();
-            }
-            soundEnabled = !soundEnabled;
-            break;
-        }
         case 72: {
             $('#help').toggle();
             break;
@@ -218,9 +200,10 @@ function onKey(e) {
 
 function getPosition() {
     var i, tx, velx, bnd;
+
     for (i = 0; i < 2; i++) {
-        if (keyMove[i].up && frameindex[i] == -1) {
-            frameindex[i] = 0;
+        if (keyMove[i].up && frameIndex[i] == -1) {
+            frameIndex[i] = 0;
         }
         tx = x[i] + (velx = keyMove[i].left + keyMove[i].right);
         bnd = 3 + i * 155;
@@ -231,34 +214,34 @@ function getPosition() {
                 x[i] = bnd + 119;
             }
         } else {
-            if (tx>bnd) {
+            if (tx > bnd) {
                 x[i] = tx;
             } else {
                 x[i] = bnd;
             }
-            if (frameindex[i] == -2) {
-                y[i] = 173;
-                frame[i] = 0;
-                frameindex[i] = -1;
-            }
-            if (frameindex[i] == -1) {
-                if (velx!=0) {
-                    if (Math.abs(px[i] - x[i]) > 4) {
-                        frame[i] ^= 1;
-                        px[i] = x[i];
-                    }
-                } else {
-                    frame[i] = 0;
+        }
+        if (frameIndex[i] == -2) {
+            y[i] = 173;
+            frame[i] = 0;
+            frameIndex[i] = -1;
+        }
+        if (frameIndex[i] == -1) {
+            if (velx != 0) {
+                if (Math.abs(px[i] - x[i]) > 4) {
+                    frame[i] ^= 1;
+                    px[i] = x[i];
                 }
             } else {
-                frame[i] = 2 + (frameindex[i] > 18);
-                if (frameindex[i] == 19) {
-                    y[i] -= 4;
-                }
-                y[i] += jump[frameindex[i]++];
-                if (frameindex[i] > 37) {
-                    frameindex[i] = -2;
-                }
+                frame[i] = 0;
+            }
+        } else {
+            frame[i] = 2 + (frameIndex[i] > 18);
+            if (frameIndex[i] == 19) {
+                y[i] -= 4;
+            }
+            y[i] += jump[frameIndex[i]++];
+            if (frameIndex[i] > 37) {
+                frameIndex[i] = -2;
             }
         }
     }
@@ -299,9 +282,6 @@ function resetPt() {
 
 function calculateScore() {
     if (winner == server) {
-        if (soundEnabled && mode != 'menu') {
-            sounds.point.play()
-        }
         score[winner]++;
         if (score[winner] > 14 && score[winner] - score[1 - winner] > 1) {
             if (mode == 'play') {
@@ -319,10 +299,7 @@ function calculateScore() {
             }
         }
     } else {
-        if (soundEnabled && mode != 'menu') {
-            sounds.loss.play();
-        }
-        server=winner;
+        server = winner;
         putScore();
     }
     putScore();
@@ -330,13 +307,13 @@ function calculateScore() {
     by = (tby = pby = 135) << 6;
     bFrame = bLogic = bVelX = bVelY = hits = rebound[0] = rebound[1] = 0;
     bIndex = 6;
-    serve = serveVel=1;
+    serve = servevel = 1;
     hitter = 2;
-    compServe = Math.abs(rnd) % 5;
+    compserve = Math.abs(rnd) % 5;
     if (score[server] == 14) {
-        compServe = 5;
+        compserve = 5;
     }
-    sStage = 0;
+    sstage = 0;
 }
 
 function destination(pl, destX, tol) {
@@ -358,9 +335,7 @@ function destination(pl, destX, tol) {
 }
 
 function moveBall() {
-    var rbVelX;
-    var rbVelY;
-    var hitFloor;
+    var rbVelX, rbVelY, hitFloor;
     rbVelX = bVelX;
     rbVelY = bVelY;
     if (rbVelX > 319) {
@@ -379,9 +354,9 @@ function moveBall() {
     pby = tby;
     bx += rbVelX;
     by += rbVelY;
-    if (bx<320) {
+    if (bx < 320) {
         bx = 320;
-        rbVelX =- rbVelX;
+        rbVelX = -rbVelX;
         rbVelX -= rbVelX >> 4;
         rbVelY -= rbVelY >> 4;
         if (hitter == 1) {
@@ -391,7 +366,7 @@ function moveBall() {
     }
     if (bx > 18112) {
         bx = 18112;
-        rbVelX =- rbVelX;
+        rbVelX = -rbVelX;
         rbVelX -= rbVelX >> 4;
         rbVelY -= rbVelY >> 4;
         if (hitter == 0) {
@@ -412,7 +387,7 @@ function moveBall() {
     } else {
         hitFloor = 1;
     }
-    if (rbVelY>0) {
+    if (rbVelY > 0) {
         rbVelY += 1;
     } else {
         rbVelY += 1;
@@ -421,35 +396,33 @@ function moveBall() {
     tby = by >> 6;
     bVelX = rbVelX;
     bVelY = rbVelY;
+
     return hitFloor;
 }
 
 function doCollisions() {
-    var i, dx, dy, dist, rndOff, avy, jif, per;
+    var i, dx, dy, dist, rndoff, avy, jif, per;
 
     for (i = 0; i < 2; i++) {
         dx = tbx - x[i] - i * 7;
         dy = tby - y[i] >> 1;
         dist = (dx >> 2) * dx + dy * dy;
         if (dist < 110) {
-            rndOff = 8 - (rnd & 15);
-            if (frameindex[i] > -1) {
-                bVelY = -Math.abs(bVelY) + (jump[frameindex[i]] << (3 << serveVel));
+            rndoff = 8 - (rnd & 15);
+            if (frameIndex[i] > -1) {
+                bVelY = -Math.abs(bVelY) + (jump[frameIndex[i]] << (3 << servevel));
             } else {
                 bVelY = -Math.abs(bVelY);
             }
-            bVelY += rndOff;
-            bVelX += dx * Math.abs(dx) + (keyMove[i].right + keyMove[i].left << (4 + serveVel)) + rndOff;
+            bVelY += rndoff;
+            bVelX += dx * Math.abs(dx) + (keyMove[i].right + keyMove[i].left << (4 + servevel)) + rndoff;
             if (!rebound[i]) {
-                if (!menuon) {
+                if (!menuOn) {
                     avy = Math.abs(320 - Math.abs(bVelY));
                     per = 300 + avy;
                     jif = per >> 5;
-                    if (soundEnabled && mode != 'menu') {
-                        sounds.hit.play()
-                    }
                 }
-                byTop = 200;
+                bytop = 200;
                 serve = 0;
                 rebound[i] = 1;
                 if (hitter != i) {
@@ -460,10 +433,7 @@ function doCollisions() {
                 }
             }
         } else {
-            if (rebound[i]) {
-                rebound[i] = 0;
-                serveVel = 0;
-            }
+            if (rebound[i]) rebound[i] = servevel = 0;
         }
     }
     i = 1;
@@ -472,12 +442,11 @@ function doCollisions() {
             bVelX = -Math.abs(bVelX) >> 1;
             bx = 127 * 64;
             i = 0;
-        } else {
-            if (pbx > 159 && tbx < 160) {
-                bVelX = Math.abs(bVelX) >> 1;
-                bx = 160 * 64;
-                i = 0;
-            }
+        } else
+        if (pbx > 159 && tbx < 160) {
+            bVelX = Math.abs(bVelX) >> 1;
+            bx = 160 * 64;
+            i = 0;
         }
     }
     if (i && tby > 81 && tbx > 127 && tbx < 160) {
@@ -488,7 +457,7 @@ function doCollisions() {
                 bVelX = Math.abs(bVelX);
             }
         } else {
-            if ((tbx > 147 && 161 - tbx >= polecol[91 - tby]) || (tbx < 148 && tbx - 133 >= polecol[91-tby])) {
+            if ((tbx > 147 && 161 - tbx >= polecol[91 - tby]) || (tbx < 148 && tbx - 133 >= polecol[91 - tby])) {
                 if (bVelY > 0) {
                     dx = tbx - 145;
                     if (dx < -5) {
@@ -511,14 +480,14 @@ function doCollisions() {
 }
 
 function computer0() {
-    var yStep, destX, dx, rndOff, dest;
+    var yStep, destX, dx, rndoff, dest;
     keyMove[0].up = 0;
-    if (tby < byTop) {
-        byTop = tby;
+    if (tby < bytop) {
+        bytop = tby;
     }
-    rndOff = 5 - rnd % 10;
+    rndoff = 5 - rnd % 10;
     if (serve && ((server & 1) == 0)) {
-        switch (compServe) {
+        switch (compserve) {
             case 0: {
                 dest = destination(0, 55, 2);
                 break;
@@ -532,21 +501,9 @@ function computer0() {
                 break;
             }
             case 3: {
-                if (sStage == 0) {
-                    if (dest = destination(0,44,2)) {
-                        sStage = 1;
-                    }
-                }
-                else {
-                    destination(0,58,2);
-                    dest = 1;
-                }
-                break;
-            }
-            case 4 : {
-                if (sStage == 0) {
-                    if (dest = destination(0, 90, 2)) {
-                        sStage = 1;
+                if (sstage == 0) {
+                    if (dest = destination(0, 44, 2)) {
+                        sstage = 1;
                     }
                 } else {
                     destination(0, 58, 2);
@@ -554,14 +511,25 @@ function computer0() {
                 }
                 break;
             }
-            case 5 : {
-                if (sStage == 0) {
+            case 4: {
+                if (sstage == 0) {
+                    if (dest = destination(0, 90, 2)) {
+                        sstage = 1;
+                    }
+                } else {
+                    destination(0, 58, 2);
+                    dest = 1;
+                }
+                break;
+            }
+            case 5: {
+                if (sstage == 0) {
                     if (destination(0, 3, 2)) {
-                        sStage = 1;
+                        sstage = 1;
                     }
                     dest = 0;
                 } else {
-                    destination(0, 8 + sStage++, 1);
+                    destination(0, 8 + sstage++, 1);
                     dest = 1;
                 }
                 break;
@@ -574,35 +542,35 @@ function computer0() {
                 yStep = 0;
             } else {
                 yStep = (140 - tby) / (bVelY >> 6);
-                if (yStep < 1 || (bVelX >> 6) == 0) {
-                    destX = tbx;
+            }
+            if (yStep < 1 || (bVelX >> 6) == 0) {
+                destX = tbx;
+            } else {
+                destX = tbx + (bVelX >> 6) * yStep - 4;
+            }
+            dx = x[0] - tbx;
+            if (Math.abs(bVelX) < 128 && bytop < 75) {
+                if ((tby < 158) ^ (bVelX < 0)) {
+                    destination(0, tbx - 15, 3);
                 } else {
-                    destX = tbx + (bVelX >> 6) * yStep - 4;
+                    destination(0, tbx + 15, 3);
                 }
-                dx = x[0] - tbx;
-                if (Math.abs(bVelX) < 128 && byTop < 75) {
-                    if ((tby < 158) ^ (bVelX < 0)) {
-                        destination(0, tbx - 15, 3);
+            } else {
+                if (tby > 130) {
+                    if (Math.abs(dx) > 6 && Math.abs(bVelX) < 1024) {
+                        destination(0, tbx - (x[0] - 60 >> 3), 3);
                     } else {
-                        destination(0, tbx + 15, 3);
+                        destination(0, tbx + rndoff + (x[0] - 60 >> 3), 10);
+                        keyMove[0].up = x[0] < 105 && (hitter != 0 || hits < 2);
                     }
                 } else {
-                    if (tby > 130) {
-                        if (Math.abs(dx) > 6 && Math.abs(bVelX) < 1024) {
-                            destination(0, tbx - (x[0] - 60 >> 3), 3);
-                        } else {
-                            destination(0, tbx + rndOff + (x[0] - 60 >> 3), 10);
-                            keyMove[0].up = x[0] < 105 && (hitter != 0 || hits < 2);
-                        }
-                    } else {
-                        if (destX < 3) {
-                            destX = 6 - destX;
-                        }
-                        if (destX>123) {
-                            destX = 246 - destX;
-                        }
-                        destination(0, destX + rndOff, 3);
+                    if (destX < 3) {
+                        destX = 6 - destX;
                     }
+                    if (destX > 123) {
+                        destX = 246 - destX;
+                    }
+                    destination(0, destX + rndoff, 3);
                 }
             }
         } else {
@@ -612,14 +580,14 @@ function computer0() {
 }
 
 function computer1() {
-    var yStep, destX, dx, rndOff, dest;
+    var yStep, destX, dx, rndoff, dest;
     keyMove[1].up = 0;
-    if (tby < byTop) {
-        byTop = tby;
+    if (tby < bytop) {
+        bytop = tby;
     }
-    rndOff = 5 - rnd % 10;
+    rndoff = 5 - rnd % 10;
     if (serve && ((server & 1) == 1)) {
-        switch (compServe) {
+        switch (compserve) {
             case 0: {
                 dest = destination(1, 232, 2);
                 break;
@@ -633,9 +601,9 @@ function computer1() {
                 break;
             }
             case 3: {
-                if (sStage == 0) {
+                if (sstage == 0) {
                     if (dest = destination(1, 250, 2)) {
-                        sStage = 1;
+                        sstage = 1;
                     }
                 } else {
                     destination(1, 220, 2);
@@ -643,10 +611,10 @@ function computer1() {
                 }
                 break;
             }
-            case 4 : {
-                if (sStage == 0) {
+            case 4: {
+                if (sstage == 0) {
                     if (dest = destination(1, 190, 2)) {
-                        sStage = 1;
+                        sstage = 1;
                     }
                 } else {
                     destination(1, 230, 2);
@@ -654,14 +622,14 @@ function computer1() {
                 }
                 break;
             }
-            case 5 : {
-                if (sStage == 0) {
+            case 5: {
+                if (sstage == 0) {
                     if (destination(1, 277, 2)) {
-                        sStage = 1;
+                        sstage = 1;
                     }
                     dest = 0;
                 } else {
-                    destination(1, 272 - sStage++, 1);
+                    destination(1, 272 - sstage++, 1);
                     dest = 1;
                 }
                 break;
@@ -681,7 +649,7 @@ function computer1() {
                 destX = tbx + (bVelX >> 6) * yStep - 4;
             }
             dx = x[1] - tbx;
-            if (Math.abs(bVelX) < 128 && byTop < 75) {
+            if (Math.abs(bVelX) < 128 && bytop < 75) {
                 if ((tby < 158) ^ (bVelX < 0)) {
                     destination(1, tbx + 15, 3);
                 } else {
@@ -692,7 +660,7 @@ function computer1() {
                     if (Math.abs(dx) > 6 && Math.abs(bVelX) < 1024) {
                         destination(1, tbx + (x[1] - 218 >> 3), 3);
                     } else {
-                        destination(1, tbx - rndOff - (x[1] - 218 >> 3), 10);
+                        destination(1, tbx - rndoff - (x[1] - 218 >> 3), 10);
                         keyMove[1].up = x[1] > 175 && (hitter != 1 || hits < 2);
                     }
                 } else {
@@ -702,7 +670,7 @@ function computer1() {
                     if (destX > 277) {
                         destX = 554 - destX;
                     }
-                    destination(1, destX - rndOff, 3);
+                    destination(1, destX - rndoff, 3);
                 }
             }
         } else {
@@ -722,14 +690,14 @@ function initGame() {
     bVelY = 0;
     tby = 0;
     bIndex = 6;
-    byTop = 200;
+    bytop = 200;
     x[0] = 64;
     x[1] = 226;
     tbx = 400;
     for (i = 0; i < 2; i++) {
         px[i] = x[i];
         y[i] = 173;
-        frameindex[i] = -1;
+        frameIndex[i] = -1;
         rebound[i] = 0;
         score[i] = 0;
         keyMove[i].right = 0;
@@ -738,21 +706,16 @@ function initGame() {
         frame[i] = 0;
     }
     putShapes();
-
     tbx = 64 + starter * 165;
     pbx = tbx;
     bx = tbx << 6;
     tby = 135
     pby = 135
     by = tby << 6;
-
     server = 2 + starter;
     hitter = 2;
-    serve = 1;
-    serveVel = 1;
-
+    serve = servevel = 1;
     rMode = false;
-
     putScore();
 }
 
@@ -766,39 +729,35 @@ function stopLoop() {
 
 function putScore() {
     var y = 8;
-
     var vs = "" + score[0];
-    var startX = 64;
+    var startx = 64;
     if (vs.length < 2) {
         vs = "0" + vs;
     }
-    startX = 64;
-    ctx.clearRect(startX, y, 16 * 3, 16);
-    draw(vs[0], startX, y);
-    startX += 16;
-    draw(vs[1], startX, y);
-    startX += 16;
+    startx = 64;
+    canvasContext.clearRect(startx, y, 16 * 3, 16);
+    draw(vs[0], startx, y);
+    startx += 16;
+    draw(vs[1], startx, y);
+    startx += 16;
     if (server == 0) {
-        draw('star', startX, y);
+        draw('star', startx, y);
     }
-
     vs = "" + score[1];
-    if (vs.length < 2) {
-        vs = "0" + vs;
-    }
-    startX = 528;
-    ctx.clearRect(startX, y, 16 * 3, 16);
-    draw(vs[0], startX, y);
-    startX += 16;
-    draw(vs[1], startX, y);
-    startX += 16;
+    if (vs.length < 2) vs = "0" + vs;
+    startx = 528;
+    canvasContext.clearRect(startx, y, 16 * 3, 16);
+    draw(vs[0], startx, y);
+    startx += 16;
+    draw(vs[1], startx, y);
+    startx += 16;
     if (server == 1) {
-        draw('star', startX, y);
+        draw('star', startx, y);
     }
 }
 
 function draw(sn, x, y) {
-    ctx.drawImage(
+    canvasContext.drawImage(
         sprites,
         spriteCoords[sn][0],
         spriteCoords[sn][1],
@@ -814,9 +773,9 @@ function draw(sn, x, y) {
 function putShapes() {
     var sprite;
     if (oCoords) {
-        ctx.clearRect(obx - 1, oby - 1, spriteCoords.ball1[2] + 2, spriteCoords.ball1[3] + 2);
-        ctx.clearRect(olx - 1, oly - 1, spriteCoords.left1[2] + 2, spriteCoords.left1[3] + 2);
-        ctx.clearRect(orx - 1, ory - 1, spriteCoords.right1[2] + 2, spriteCoords.right1[3] + 2);
+        canvasContext.clearRect(obx - 1, oby - 1, spriteCoords.ball1[2] + 2, spriteCoords.ball1[3] + 2);
+        canvasContext.clearRect(olx - 1, oly - 1, spriteCoords.left1[2] + 2, spriteCoords.left1[3] + 2);
+        canvasContext.clearRect(orx - 1, ory - 1, spriteCoords.right1[2] + 2, spriteCoords.right1[3] + 2);
     }
     sprite = "ball" + (Math.floor(tbx / 16) % 4 + 1);
     draw(sprite, tbx * 2 + 4, tby * 2);
@@ -848,22 +807,21 @@ function putShapes() {
     draw(sprite, x[1] * 2 + 4, y[1] * 2);
     orx = x[1] * 2 + 4;
     ory = y[1] * 2;
-
     oCoords = true;
 }
 
 function game() {
-    if (mode == 'play'  || mode == 'menu') {
+    if (mode == 'play' || mode == 'menu') {
         rnd = (rnd * 5 + 1) % 32767;
 
-        if (opts[0] == 'C') {
+        if (options[0] == 'C') {
             computer0();
         }
-        if (opts[1] == 'C') {
+        if (options[1] == 'C') {
             computer1();
         }
         if (rMode) {
-            if (rCnt-- > 0 || frameindex[0] != -1 || frameindex[1] != -1) {
+            if (rCnt-- > 0 || frameIndex[0] != -1 || frameIndex[1] != -1) {
                 resetPt();
             } else {
                 rMode = false;
